@@ -51,7 +51,7 @@ grep -q '\[PROJECT_NAME\]' .specify/memory/constitution.md && echo "fresh" || ec
 
 ---
 
-### The seven required principles
+### The required principles
 
 These are the minimum principles that MUST be present in every project constitution. Reference them in both cases below.
 
@@ -68,6 +68,14 @@ These are the minimum principles that MUST be present in every project constitut
 > VI. **Folder structure by concern** — When the project includes a frontend, backend, or both, each lives in a dedicated root-level folder named `frontend/`, `backend/`, or both. A separate `test/` folder at the root contains all contract and e2e test code. No mixing of app code and test code.
 >
 > VII. **Ports as Makefile parameters with safe defaults** — All service ports MUST be configurable via Makefile parameters (e.g., `make run PORT=3001`) to avoid conflicts when running multiple projects. Define sensible defaults in the Makefile but never hardcode ports in Docker run commands or source code.
+>
+> VIII. **GitHub via `gh` CLI — repository management** — All GitHub operations (creating repos, opening PRs, managing issues, reviewing, merging) MUST be performed using the `gh` CLI. Never use the GitHub web UI or `git` remote commands for operations that `gh` covers. Create the repo with `gh repo create`, open PRs with `gh pr create`, and manage issues with `gh issue create/list/close`.
+>
+> IX. **Branch-per-feature workflow** — Every unit of work lives on its own branch created with `gh` or the speckit git extension. Branch names follow the pattern `<number>-<short-description>` (e.g. `001-user-auth`). `main` is always deployable; direct commits to `main` are forbidden. Branches are merged via PR only, reviewed and approved before merge.
+>
+> X. **PRs as the integration gate** — All merges into `main` happen through a Pull Request opened with `gh pr create`. The PR description must reference the related issue or spec. Squash-merge is preferred to keep history linear. Delete the branch after merge with `gh pr merge --squash --delete-branch`.
+>
+> XI. **Issues for every tracked unit of work** — Features, bugs, and tasks are tracked as GitHub Issues. Open issues with `gh issue create` before starting work. Close them automatically by referencing `Closes #<n>` in the PR description. Never start a branch without a linked issue.
 
 ---
 
@@ -84,6 +92,10 @@ The constitution has never been filled in. Before creating it, **present the sev
 > 5. **Tests e2e (frontend) + contrato (backend) en Python** — Ejecutados con Docker y Make.
 > 6. **Carpetas separadas: `frontend/`, `backend/`, `test/`** — Una por concern en el root.
 > 7. **Puertos como parámetros de Make** — Con defaults, pero siempre configurables.
+> 8. **GitHub via `gh` CLI** — Repositorios, PRs e issues siempre con `gh`; nunca desde la UI web.
+> 9. **Branch por feature** — Patrón `<número>-<descripción>`, `main` siempre deployable, sin commits directos.
+> 10. **PRs como puerta de integración** — Todo merge a `main` por PR; squash-merge y borrar branch tras merge.
+> 11. **Issues para toda unidad de trabajo** — Abrir issue antes de empezar; cerrar automáticamente con `Closes #n` en el PR.
 >
 > ¿Los acepta tal como están, o desea modificar o agregar algo?"
 
