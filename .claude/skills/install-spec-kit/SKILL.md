@@ -51,14 +51,10 @@ grep -q '\[PROJECT_NAME\]' .specify/memory/constitution.md && echo "fresh" || ec
 
 ---
 
-### Case A — `fresh` (template placeholders still present)
+### The seven required principles
 
-The constitution has never been filled in. Invoke `/speckit-constitution` to create it from scratch using **all** of the following required principles. Infer the project name from the current directory name or any manifest (`package.json`, `pyproject.toml`, `go.mod`).
+These are the minimum principles that MUST be present in every project constitution. Reference them in both cases below.
 
-Pass this verbatim as the argument:
-
-> **Required principles for this project:**
->
 > I. **Makefile as the single entry point** — Every script, task, build, test, and service lifecycle action MUST be invoked through `make`. No direct calls to language runtimes, package managers, or shell scripts from outside the Makefile. The Makefile is the contract between the developer and the project.
 >
 > II. **Docker for every service, no exceptions** — All services, runtimes, and tools run inside Docker containers. No language or runtime (Node, Python, Go, etc.) is installed locally. `docker-compose` is explicitly forbidden to maximize portability; use plain `docker run` or `docker build` via Makefile targets instead.
@@ -75,15 +71,46 @@ Pass this verbatim as the argument:
 
 ---
 
+### Case A — `fresh` (template placeholders still present)
+
+The constitution has never been filled in. Before creating it, **present the seven principles to the user** in a clear, readable summary and ask for confirmation:
+
+> "Voy a crear la constitución del proyecto con los siguientes principios base. Puedes aceptarlos, modificar alguno, o agregar principios adicionales antes de que los escriba:
+>
+> 1. **Makefile como punto de entrada único** — Todo se ejecuta con `make`.
+> 2. **Docker para todo, sin docker-compose** — Sin instalaciones locales de lenguajes.
+> 3. **Deploy en Railway via MCP** — Usar `mcp__railway__*` salvo que indiques lo contrario.
+> 4. **`.env` para toda configuración** — Nunca hardcodear valores; `.env.example` commiteado.
+> 5. **Tests e2e (frontend) + contrato (backend) en Python** — Ejecutados con Docker y Make.
+> 6. **Carpetas separadas: `frontend/`, `backend/`, `test/`** — Una por concern en el root.
+> 7. **Puertos como parámetros de Make** — Con defaults, pero siempre configurables.
+>
+> ¿Los acepta tal como están, o desea modificar o agregar algo?"
+
+**Wait for the user's response.** Incorporate any changes or additions they specify.
+
+Then invoke `/speckit-constitution` with the confirmed (and possibly modified) principles plus the inferred project name from the current directory or any manifest (`package.json`, `pyproject.toml`, `go.mod`).
+
+---
+
 ### Case B — `customized` (constitution already has content)
 
-The constitution exists. Validate that **every one of the seven required principles above** is addressed. For each principle, check whether the existing constitution covers the intent — exact wording need not match, but the constraint must be present.
+Read the existing constitution and validate that **each of the seven required principles** is addressed. Exact wording need not match, but the constraint must be present and unambiguous.
 
-For each missing or incomplete principle, note it. Then invoke `/speckit-constitution` passing only what needs to be added or strengthened, framed as amendments:
+Build a list of gaps — principles that are missing or too vague to enforce.
 
-> The following required principles are missing or incomplete and must be added: [list each gap with its full description from the seven principles above].
+**Present the findings to the user before making any changes:**
 
-If all seven are already covered, skip — no action needed.
+> "Revisé la constitución existente. [Si hay gaps:] Los siguientes principios requeridos no están cubiertos o están incompletos:
+>
+> - **[Principio X]**: [descripción breve de qué falta]
+> - …
+>
+> Voy a agregarlos como enmiendas. ¿Los acepta tal como están, o desea ajustar algo antes?"
+>
+> [Si no hay gaps:] "La constitución ya cubre todos los principios requeridos. No es necesario hacer cambios."
+
+**Wait for the user's response.** If they approve (with or without modifications), invoke `/speckit-constitution` passing only the gaps as amendments, incorporating any adjustments the user specified. If there are no gaps, skip.
 
 ---
 
