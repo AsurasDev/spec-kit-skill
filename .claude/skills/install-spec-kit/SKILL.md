@@ -76,6 +76,8 @@ These are the minimum principles that MUST be present in every project constitut
 > X. **PRs as the integration gate** — All merges into `main` happen through a Pull Request opened with `gh pr create`. The PR description must reference the related issue or spec. Squash-merge is preferred to keep history linear. Delete the branch after merge with `gh pr merge --squash --delete-branch`.
 >
 > XI. **Issues for every tracked unit of work** — Features, bugs, and tasks are tracked as GitHub Issues. Open issues with `gh issue create` before starting work. Close them automatically by referencing `Closes #<n>` in the PR description. Never start a branch without a linked issue.
+>
+> XII. **Seeds for all data management** — Database structure, base data, and test data are managed exclusively through seed scripts, never through manual SQL or ad-hoc migrations run by hand. Seeds are organized in three layers: (1) `schema` — creates or evolves the data structures; (2) `base` — inserts the minimum required data for the app to function (catalogs, admin users, config records); (3) `test` — inserts realistic test data for development and QA. Seeds run automatically on every deploy as part of the startup sequence via a Makefile target (e.g. `make seed`). Every seed script MUST read the `APP_ENV` (or equivalent) environment variable and act accordingly: `schema` and `base` seeds run in all environments; `test` seeds run ONLY when `APP_ENV` is `development` or `test` — never in `production` or `staging`. Seeds MUST be idempotent: safe to run multiple times without duplicating or corrupting data (use upsert, `INSERT OR IGNORE`, or equivalent). Never seed production with test data.
 
 ---
 
@@ -96,6 +98,7 @@ The constitution has never been filled in. Before creating it, **present the sev
 > 9. **Branch por feature** — Patrón `<número>-<descripción>`, `main` siempre deployable, sin commits directos.
 > 10. **PRs como puerta de integración** — Todo merge a `main` por PR; squash-merge y borrar branch tras merge.
 > 11. **Issues para toda unidad de trabajo** — Abrir issue antes de empezar; cerrar automáticamente con `Closes #n` en el PR.
+> 12. **Seeds para toda gestión de datos** — Estructura, datos base y datos de prueba se crean via seeds en 3 capas: `schema`, `base` y `test`. Corren automáticamente en cada deploy (`make seed`). Los seeds de `test` solo se ejecutan si `APP_ENV` es `development` o `test`, nunca en `production`. Siempre idempotentes.
 >
 > ¿Los acepta tal como están, o desea modificar o agregar algo?"
 
