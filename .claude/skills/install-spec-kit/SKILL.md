@@ -39,6 +39,54 @@ The driver:
 5. Runs `specify init --here --force --integration <integration> --ignore-agent-tools`
 6. Restores the constitution backup (preserving any customizations)
 
+## After install: constitution setup
+
+Once the driver completes, handle the constitution in one of two ways:
+
+### Detect state
+
+```bash
+grep -q '\[PROJECT_NAME\]' .specify/memory/constitution.md && echo "fresh" || echo "customized"
+```
+
+---
+
+### Case A — `fresh` (template placeholders still present)
+
+The constitution has never been filled in. Invoke `/speckit-constitution` to create it from scratch using **all** of the following required principles. Infer the project name from the current directory name or any manifest (`package.json`, `pyproject.toml`, `go.mod`).
+
+Pass this verbatim as the argument:
+
+> **Required principles for this project:**
+>
+> I. **Makefile as the single entry point** — Every script, task, build, test, and service lifecycle action MUST be invoked through `make`. No direct calls to language runtimes, package managers, or shell scripts from outside the Makefile. The Makefile is the contract between the developer and the project.
+>
+> II. **Docker for every service, no exceptions** — All services, runtimes, and tools run inside Docker containers. No language or runtime (Node, Python, Go, etc.) is installed locally. `docker-compose` is explicitly forbidden to maximize portability; use plain `docker run` or `docker build` via Makefile targets instead.
+>
+> III. **Deploy to Railway via MCP** — All deployments target Railway. When asked to deploy, use the Railway MCP server (`mcp__railway__*` tools) unless the user explicitly specifies a different target. Never deploy manually or through other providers by default.
+>
+> IV. **`.env` files for all configurable values** — Backend projects and test suites MUST read configuration from `.env` files. No hardcoded URLs, credentials, ports, or environment-specific values in source code. Provide a `.env.example` committed to the repo; the actual `.env` is gitignored.
+>
+> V. **Always implement tests: e2e (frontend) + contract (backend)** — Frontend features require end-to-end tests; backend services require contract tests. Both test suites are written in Python, run inside Docker, and invoked through Makefile targets. The test runner starts the app with `make` (which uses Docker), then validates behavior from the outside.
+>
+> VI. **Folder structure by concern** — When the project includes a frontend, backend, or both, each lives in a dedicated root-level folder named `frontend/`, `backend/`, or both. A separate `test/` folder at the root contains all contract and e2e test code. No mixing of app code and test code.
+>
+> VII. **Ports as Makefile parameters with safe defaults** — All service ports MUST be configurable via Makefile parameters (e.g., `make run PORT=3001`) to avoid conflicts when running multiple projects. Define sensible defaults in the Makefile but never hardcode ports in Docker run commands or source code.
+
+---
+
+### Case B — `customized` (constitution already has content)
+
+The constitution exists. Validate that **every one of the seven required principles above** is addressed. For each principle, check whether the existing constitution covers the intent — exact wording need not match, but the constraint must be present.
+
+For each missing or incomplete principle, note it. Then invoke `/speckit-constitution` passing only what needs to be added or strengthened, framed as amendments:
+
+> The following required principles are missing or incomplete and must be added: [list each gap with its full description from the seven principles above].
+
+If all seven are already covered, skip — no action needed.
+
+---
+
 After a successful run, these slash commands are available in the project:
 
 | Command | Purpose |
